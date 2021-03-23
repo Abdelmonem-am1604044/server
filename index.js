@@ -4,8 +4,6 @@ const express = require('express'),
   port = process.env.PORT || 3000,
   mongoose = require('mongoose'),
   logger = require('morgan'),
-  authRoutes = require('./routes/authRoutes'),
-  requireAuth = require('./middlewares/requireAuth'),
   http = require('http').createServer(app),
   io = require('socket.io')(http),
   controller = require('./controllers/controller');
@@ -13,14 +11,12 @@ const express = require('express'),
 app.use(express.json({ extended: false }));
 
 app.use(logger('dev'));
-app.use(authRoutes);
 
 // define routes
 app.get('/new_record/:temperature/:humidity', controller.submitRecord);
 
 app.get('/records', controller.getLatestData);
 
-app.post('/civil_defense', controller.validateCivilDefense);
 
 mongoose
   .connect('mongodb://127.0.0.1:27017/smartFireAlarm', {
@@ -31,10 +27,8 @@ mongoose
     console.log(error.message);
   });
 
-io.on('connection', (socket) => {
-  console.log(socket.handshake.query.type);
-  socket.join(socket.handshake.query.type);
-  // console.log('a user connected');
+io.on('connection', () => {
+  console.log('object');
 });
 
 global.io = io;
